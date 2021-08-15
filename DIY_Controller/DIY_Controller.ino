@@ -14,24 +14,65 @@
 // pins left, 4,5,6,0,1 (5 pins for 10 buttons -> needs input encoder thing)
 // SN74HC165N 8buttons to serial connection (Dpad+ABXY)    latch,clock,data     5V+GND
 
+//JoyStick config max ranges
+//Throttle [106 893]
+//Yaw [139 918]
 
 
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-LiquidCrystal_I2C lcd(0x27,16,2);
+LiquidCrystal_I2C lcd(0x27,16,2); //Initialise LCD Connection (needs to be connected to I2C pins SDA SCL which are pins 2 and  respectively on Pro Micro)
 
+int JoyThrtl_Con  = A0;
+int JoyYaw_Con    = A1
+int JoyPitch_Con  = A2;
+int JoyRoll_Con   = A3;
 
+int JoyThrtl_Pos  = 0;
+int JoyRoll_Pos   = 0;
+int JoyPitch_Pos  = 0;
+int JoyRoll_Pos   = 0;
+
+int Throttle      = 0;
+int Yaw           = 0;
+int Roll          = 0;
+int Pitch         = 0;
 
 void setup() {
   // put your setup code here, to run once:
-  lcd.init();
-  lcd.backlight();
+  Serial.begin(9600);
+  pinMode(JoyThrtl_Con, INPUT);
+  pinMode(JoyYaw_Con, INPUT);
+  pinMode(JoyPitch_Con, INPUT);
+  pinMode(JoyRoll_Con, INPUT);
+//  lcd.init();
+//  lcd.backlight();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  updateLCD();
+//  updateLCD();
+  JoyThrtl_Pos = constrain(analogRead(JoyThrtl_Con), 107, 892);
+  JoyYaw_Pos = constrain(analogRead(JoyYaw_Con), 140, 917);
+  JoyPitch_Pos = constrain(analogRead(JoyPitch_Con), 110, 890); //NEEDS ADJUSTMENT
+  JoyRoll_Pos = constrain(analogRead(JoyRoll_Con), 110, 890);   //NEEDS ADJUSTMENT
+  Throttle = map(JoyThrtl_Pos, 107, 892, 0, 511);
+  Yaw = map(JoyYaw_Pos, 140, 917, 0, 511);
+  Pitch = map(JoyPitch_Pos, 107, 892, 0, 511);
+  Roll = map(JoyRoll_Pos, 140, 917, 0, 511);
+  
+  
+
+  Serial.print("Pitch:");
+  Serial.print(JoyPitch_Pos);
+  Serial.print(Pitch);
+  Serial.print("Roll:");
+  Serial.print(JoyRoll_Pos);
+  Serial.println(Roll);
+
+  delay(100);
+
 }
 
 void updateLCD(){
