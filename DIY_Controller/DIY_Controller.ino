@@ -31,13 +31,16 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  updateLCD();
+}
+
+void updateLCD(){
   lcd.setCursor(2,0); //3rd column 1st row
-  lcd.print("Hoi Maureen");
+  lcd.print("Hoi Maureeeeen");
   lcd.setCursor(2,1);
   lcd.print("<3 <3 <3 <3");
   lcd.noCursor();
   delay(1000);
   lcd.clear();
   delay(1000);
-
 }
