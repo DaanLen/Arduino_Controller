@@ -24,13 +24,15 @@
 
 LiquidCrystal_I2C lcd(0x27,16,2); //Initialise LCD Connection (needs to be connected to I2C pins SDA SCL which are pins 2 and  respectively on Pro Micro)
 
+//Define Pins
 int JoyThrtl_Con  = A0;
-int JoyYaw_Con    = A1
+int JoyYaw_Con    = A1;
 int JoyPitch_Con  = A2;
 int JoyRoll_Con   = A3;
 
+//Set initial values
 int JoyThrtl_Pos  = 0;
-int JoyRoll_Pos   = 0;
+int JoyYaw_Pos   = 0;
 int JoyPitch_Pos  = 0;
 int JoyRoll_Pos   = 0;
 
@@ -40,7 +42,6 @@ int Roll          = 0;
 int Pitch         = 0;
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
   pinMode(JoyThrtl_Con, INPUT);
   pinMode(JoyYaw_Con, INPUT);
@@ -53,33 +54,39 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 //  updateLCD();
-  JoyThrtl_Pos = constrain(analogRead(JoyThrtl_Con), 107, 892);
-  JoyYaw_Pos = constrain(analogRead(JoyYaw_Con), 140, 917);
-  JoyPitch_Pos = constrain(analogRead(JoyPitch_Con), 110, 890); //NEEDS ADJUSTMENT
-  JoyRoll_Pos = constrain(analogRead(JoyRoll_Con), 110, 890);   //NEEDS ADJUSTMENT
-  Throttle = map(JoyThrtl_Pos, 107, 892, 0, 511);
-  Yaw = map(JoyYaw_Pos, 140, 917, 0, 511);
-  Pitch = map(JoyPitch_Pos, 107, 892, 0, 511);
-  Roll = map(JoyRoll_Pos, 140, 917, 0, 511);
-  
-  
+  pollJoy();
+  mapJoy();  
+  Serial.print("Throttle:");
+  Serial.print(JoyThrtl_Pos );
+  Serial.print(Throttle);
+  Serial.print("Yaw:");
+  Serial.print(JoyYaw_Pos );
+  Serial.println(Yaw);
 
-  Serial.print("Pitch:");
-  Serial.print(JoyPitch_Pos);
-  Serial.print(Pitch);
-  Serial.print("Roll:");
-  Serial.print(JoyRoll_Pos);
-  Serial.println(Roll);
-
-  delay(100);
+  delay(500);
 
 }
 
+void mapJoy(){
+  Throttle = map(JoyThrtl_Pos, 107, 892, 0, 511); //0 at throttle off, 511 at max throttle
+  Yaw = map(JoyYaw_Pos, 150, 900, 0, 511);        //0 at full left, 511 at full right
+  Pitch = map(JoyPitch_Pos, 120, 885, 0, 511);    //0 at nose down, 511 at nose up
+  Roll = map(JoyRoll_Pos, 125, 880, 0, 511);      //0 at bank right, 511 at bank left
+}
+
+void pollJoy(){
+  JoyThrtl_Pos = constrain(analogRead(JoyThrtl_Con), 107, 892); //center at N/A
+  JoyYaw_Pos = constrain(analogRead(JoyYaw_Con), 150, 900);     //center at 245-250
+  JoyPitch_Pos = constrain(analogRead(JoyPitch_Con), 120, 885); //center at 242
+  JoyRoll_Pos = constrain(analogRead(JoyRoll_Con), 125, 880);   //center at 246
+}
+
+
 void updateLCD(){
   lcd.setCursor(2,0); //3rd column 1st row
-  lcd.print("Hoi Maureeeeen");
+  lcd.print("Test message");
   lcd.setCursor(2,1);
-  lcd.print("<3 <3 <3 <3");
+  lcd.print("testing");
   lcd.noCursor();
   delay(1000);
   lcd.clear();
