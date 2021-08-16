@@ -24,11 +24,13 @@
 
 LiquidCrystal_I2C lcd(0x27,16,2); //Initialise LCD Connection (needs to be connected to I2C pins SDA SCL which are pins 2 and  respectively on Pro Micro)
 
+//Define Pins
 int JoyThrtl_Con  = A0;
 int JoyYaw_Con    = A1
 int JoyPitch_Con  = A2;
 int JoyRoll_Con   = A3;
 
+//Set initial values
 int JoyThrtl_Pos  = 0;
 int JoyRoll_Pos   = 0;
 int JoyPitch_Pos  = 0;
