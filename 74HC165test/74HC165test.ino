@@ -10,7 +10,7 @@
 // Define Connections to 74HC165
 
 // PL pin 1
-int load = 7;
+int load = 1;
 // CE pin 15
 int clockEnablePin = 4;
 // Q7 pin 7
