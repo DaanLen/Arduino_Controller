@@ -16,7 +16,7 @@ int clockEnablePin = 4;
 // Q7 pin 7
 int dataIn = 5;
 // CP pin 2
-int clockIn = 6;
+int clockIn = 7;
 
 void setup()
 {
