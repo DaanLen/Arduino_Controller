@@ -30,6 +30,16 @@ int JoyYaw_Con    = A1;
 int JoyPitch_Con  = A2;
 int JoyRoll_Con   = A3;
 
+// Define Connections to 74HC165
+// PL pin 1
+int load = 1;
+// CE pin 15
+int clockEnablePin = 4;
+// Q7 pin 9
+int dataIn = 5;
+// CP pin 2
+int clockIn = 7;
+
 //Set initial values
 int JoyThrtl_Pos  = 0;
 int JoyYaw_Pos   = 0;
@@ -41,12 +51,22 @@ int Yaw           = 0;
 int Roll          = 0;
 int Pitch         = 0;
 
+byte incoming = 0;
+byte incoming2 = 0;
+
 void setup() {
   Serial.begin(9600);
+  //Setup Joystick connections
   pinMode(JoyThrtl_Con, INPUT);
   pinMode(JoyYaw_Con, INPUT);
   pinMode(JoyPitch_Con, INPUT);
   pinMode(JoyRoll_Con, INPUT);
+
+  // Setup 74HC165 connections
+  pinMode(load, OUTPUT);
+  pinMode(clockEnablePin, OUTPUT);
+  pinMode(clockIn, OUTPUT);
+  pinMode(dataIn, INPUT);
 //  lcd.init();
 //  lcd.backlight();
 }
@@ -54,16 +74,16 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 //  updateLCD();
-  pollJoy();
-  mapJoy();  
-  Serial.print("Throttle:");
-  Serial.print(JoyThrtl_Pos );
-  Serial.print(Throttle);
-  Serial.print("Yaw:");
-  Serial.print(JoyYaw_Pos );
-  Serial.println(Yaw);
+//  pollJoy();
+//  mapJoy();
+  read_shift_regs();
 
-  delay(500);
+    
+  // Print to serial monitor
+  Serial.print("Pin States:\r\n");
+  Serial.print(incoming, BIN);
+  Serial.println(incoming2, BIN);
+  delay(200);
 
 }
 
@@ -79,6 +99,22 @@ void pollJoy(){
   JoyYaw_Pos = constrain(analogRead(JoyYaw_Con), 150, 900);     //center at 245-250
   JoyPitch_Pos = constrain(analogRead(JoyPitch_Con), 120, 885); //center at 242
   JoyRoll_Pos = constrain(analogRead(JoyRoll_Con), 125, 880);   //center at 246
+}
+
+
+void read_shift_regs(){
+    // Write pulse to load pin
+  digitalWrite(load, LOW);
+  delayMicroseconds(5);
+  digitalWrite(load, HIGH);
+  delayMicroseconds(5);
+
+  // Get data from 74HC165
+  digitalWrite(clockIn, HIGH);
+  digitalWrite(clockEnablePin, LOW);
+  incoming = shiftIn(dataIn, clockIn, LSBFIRST);
+  incoming2 = shiftIn(dataIn, clockIn, LSBFIRST);
+  digitalWrite(clockEnablePin, HIGH);
 }
 
 
