@@ -44,10 +44,12 @@ void loop()
   digitalWrite(clockIn, HIGH);
   digitalWrite(clockEnablePin, LOW);
   byte incoming = shiftIn(dataIn, clockIn, LSBFIRST);
+  byte incoming2 = shiftIn(dataIn, clockIn, LSBFIRST);
   digitalWrite(clockEnablePin, HIGH);
 
   // Print to serial monitor
   Serial.print("Pin States:\r\n");
-  Serial.println(incoming, BIN);
+  Serial.print(incoming, BIN);
+  Serial.println(incoming2, BIN);
   delay(200);
 }
