@@ -35,7 +35,7 @@ int JoyRoll_Con   = A3;
 int load = 1;
 // CE pin 15
 int clockEnablePin = 4;
-// Q7 pin 7
+// Q7 pin 9
 int dataIn = 5;
 // CP pin 2
 int clockIn = 7;
