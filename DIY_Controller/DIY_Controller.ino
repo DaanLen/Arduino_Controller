@@ -1,5 +1,5 @@
 // Arduino layout with connections
-// Radio            MISO MOSI SCLK 2pin   pins 14+15+16+10+7  5V+GND
+// Radio            MISO MOSI SCLK 2pin   pins 14+15+16+10+7  5V+GND    CSN ->7 CE ->10
 // Joystick L       A0, A1                pins 18+19          5V+GND
 // Joystick R       A2, A3                pins 20+21          5V+GND
 // 2 rotaries       A8, A9                pins 8+9            5V+GND
@@ -38,7 +38,7 @@ int clockEnablePin = 4;
 // Q7 pin 9
 int dataIn = 5;
 // CP pin 2
-int clockIn = 7;
+int clockIn = 6;
 
 //Set initial values
 int JoyThrtl_Pos  = 0;
