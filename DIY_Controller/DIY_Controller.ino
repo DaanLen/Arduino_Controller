@@ -25,10 +25,13 @@
 LiquidCrystal_I2C lcd(0x27,16,2); //Initialise LCD Connection (needs to be connected to I2C pins SDA SCL which are pins 2 and 3 respectively on Pro Micro)
 
 //Define Pins
-int JoyThrtl_Con  = A0;
-int JoyYaw_Con    = A1;
+int JoyThrtl_Con  = A1;
+int JoyYaw_Con    = A0;
 int JoyPitch_Con  = A2;
 int JoyRoll_Con   = A3;
+
+int Rot_LeftPin      = A8;
+int Rot_RightPin     = A9;
 
 // Define Connections to 74HC165
 // PL pin 1
@@ -42,7 +45,7 @@ int clockIn = 6;
 
 //Set initial values
 int JoyThrtl_Pos  = 0;
-int JoyYaw_Pos   = 0;
+int JoyYaw_Pos    = 0;
 int JoyPitch_Pos  = 0;
 int JoyRoll_Pos   = 0;
 
@@ -50,6 +53,9 @@ int Throttle      = 0;
 int Yaw           = 0;
 int Roll          = 0;
 int Pitch         = 0;
+
+int Rot_Left      = 0;
+int Rot_Right      = 0;
 
 byte incoming = 0;
 byte incoming2 = 0;
@@ -68,40 +74,52 @@ void setup() {
   pinMode(clockIn, OUTPUT);
   pinMode(dataIn, INPUT);
 
-  lcd.init();
-  lcd.backlight();
+  //lcd.init();
+  //lcd.backlight();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 //  updateLCD();
-//  pollJoy();
-//  mapJoy();
-  read_shift_regs();
-  updateLCD();
+ pollJoy();
+ mapJoy();
+ readRot();
+ read_shift_regs();
     
   // Print to serial monitor
-  Serial.print("Pin States:\r\n");
-  Serial.print(incoming, BIN);
-  Serial.println(incoming2, BIN);
+  Serial.print(incoming);
+  Serial.println(incoming2);
   delay(200);
 
 }
 
 void mapJoy(){
   Throttle = map(JoyThrtl_Pos, 107, 892, 0, 511); //0 at throttle off, 511 at max throttle
-  Yaw = map(JoyYaw_Pos, 150, 900, 0, 511);        //0 at full left, 511 at full right
-  Pitch = map(JoyPitch_Pos, 120, 885, 0, 511);    //0 at nose down, 511 at nose up
+  Yaw = map(JoyYaw_Pos, 150, 880, 0, 511);        //0 at full left, 511 at full right
+  Pitch = map(JoyPitch_Pos, 120, 838, 0, 511);    //0 at nose down, 511 at nose up
   Roll = map(JoyRoll_Pos, 125, 880, 0, 511);      //0 at bank right, 511 at bank left
 }
 
 void pollJoy(){
   JoyThrtl_Pos = constrain(analogRead(JoyThrtl_Con), 107, 892); //center at N/A
-  JoyYaw_Pos = constrain(analogRead(JoyYaw_Con), 150, 900);     //center at 245-250
-  JoyPitch_Pos = constrain(analogRead(JoyPitch_Con), 120, 885); //center at 242
-  JoyRoll_Pos = constrain(analogRead(JoyRoll_Con), 125, 880);   //center at 246
+  JoyYaw_Pos = constrain(analogRead(JoyYaw_Con), 150, 880);     //center at 513-518
+  if (abs(515 - JoyYaw_Pos) <= 10) {                            //add deadzone so around center is always 515
+    JoyYaw_Pos = 515;
+  }
+  JoyPitch_Pos = constrain(analogRead(JoyPitch_Con), 120, 838); //center at 469-488
+  if (abs(475 - JoyPitch_Pos) <= 10) {
+    JoyPitch_Pos = 479;
+  }
+  JoyRoll_Pos = constrain(analogRead(JoyRoll_Con), 125, 851);   //center at 487-488
+  if (abs(488 - JoyRoll_Pos) <= 10) {
+    JoyRoll_Pos = 488;
+  }
 }
 
+void readRot(){
+  Rot_Left  = analogRead(Rot_LeftPin);
+  Rot_Right = analogRead(Rot_RightPin);
+}
 
 void read_shift_regs(){
     // Write pulse to load pin
