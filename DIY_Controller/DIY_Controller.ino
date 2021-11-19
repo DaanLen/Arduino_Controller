@@ -5,7 +5,7 @@
 // 2 rotaries       A8, A9                pins 8+9            5V+GND
 // "D-pad" buttons  To SN74HC165N
 // "ABXY" buttons   To SN74HC165N
-// 2 top buttons    To remaining pin, last button unable (Maybe daisychain two SN74HC165N together to be able to fit all buttons tenzij CE niet geconnect hoeft te worden op de SN74HC165N, dan blijven er twee pins over op de arduino voor de knoppen.
+// 2 top buttons    To SN74HC165N
 // Display          SDA,SCL               pins 2+3            5V+GND
 // Battery          N/A                   N/A                 5V+GND
 
@@ -22,7 +22,7 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-LiquidCrystal_I2C lcd(0x27,16,2); //Initialise LCD Connection (needs to be connected to I2C pins SDA SCL which are pins 2 and  respectively on Pro Micro)
+LiquidCrystal_I2C lcd(0x27,16,2); //Initialise LCD Connection (needs to be connected to I2C pins SDA SCL which are pins 2 and 3 respectively on Pro Micro)
 
 //Define Pins
 int JoyThrtl_Con  = A0;
@@ -67,8 +67,9 @@ void setup() {
   pinMode(clockEnablePin, OUTPUT);
   pinMode(clockIn, OUTPUT);
   pinMode(dataIn, INPUT);
-//  lcd.init();
-//  lcd.backlight();
+
+  lcd.init();
+  lcd.backlight();
 }
 
 void loop() {
@@ -77,7 +78,7 @@ void loop() {
 //  pollJoy();
 //  mapJoy();
   read_shift_regs();
-
+  updateLCD();
     
   // Print to serial monitor
   Serial.print("Pin States:\r\n");
