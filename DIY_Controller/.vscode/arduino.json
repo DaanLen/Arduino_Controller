@@ -1,0 +1,6 @@
+{
+    "port": "COM5",
+    "board": "arduino:avr:micro",
+    "programmer": "arduino:avrisp",
+    "sketch": "DIY_Controller.ino"
+}
