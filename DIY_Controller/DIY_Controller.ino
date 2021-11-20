@@ -84,7 +84,8 @@ void loop() {
  pollJoy();
  mapJoy();
  readRot();
- read_shift_regs();
+ //read_shift_regs();
+ updatePullRegister();
     
   // Print to serial monitor
   Serial.print(incoming);
@@ -134,6 +135,30 @@ void read_shift_regs(){
   incoming = shiftIn(dataIn, clockIn, LSBFIRST);
   incoming2 = shiftIn(dataIn, clockIn, LSBFIRST);
   digitalWrite(clockEnablePin, HIGH);
+}
+
+void updatePullRegister(){
+  digitalWrite(clockEnablePin, HIGH); //First step here will be to pulse the latch/reset pin while sending a falling clock signal.
+  digitalWrite(load, LOW); //This will lock in the current state of the inputs to be sent to the arduino. 
+  delayMicroseconds(5);
+  digitalWrite(clockEnablePin, LOW);
+  digitalWrite(load, HIGH); 
+
+  for(int i = 0;i<8;i++){
+    bitWrite(incoming, i, digitalRead(dataIn)); //Grab our byte, select which bit, and write the current input as 1 or 0
+
+    digitalWrite(clockEnablePin, LOW); 
+    delayMicroseconds(5);
+    digitalWrite(clockEnablePin, HIGH); //send a clock leading edge so to load the next bit
+  }
+    for(int i = 0;i<8;i++){
+    bitWrite(incoming2, i, digitalRead(dataIn)); //Grab our byte, select which bit, and write the current input as 1 or 0
+
+    digitalWrite(clockEnablePin, LOW); 
+    delayMicroseconds(5);
+    digitalWrite(clockEnablePin, HIGH); //send a clock leading edge so to load the next bit
+  }
+
 }
 
 
