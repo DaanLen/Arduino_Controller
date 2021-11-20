@@ -18,6 +18,9 @@ int dataIn = 5;
 // CP pin 2
 int clockIn = 6;
 
+byte incoming = 0;
+byte incoming2 = 0;
+
 void setup()
 {
 
@@ -33,8 +36,19 @@ void setup()
 
 void loop()
 {
+  //get_Buttons();
+  updatePullRegister();
 
-  // Write pulse to load pin
+  // Print to serial monitor
+  Serial.print("Pin States:\r\n");
+  Serial.print(incoming, BIN);
+  Serial.println(incoming2, BIN);
+  delay(400);
+}
+
+
+void get_Buttons(){
+// Write pulse to load pin
   digitalWrite(load, LOW);
   delayMicroseconds(5);
   digitalWrite(load, HIGH);
@@ -43,13 +57,32 @@ void loop()
   // Get data from 74HC165
   digitalWrite(clockIn, HIGH);
   digitalWrite(clockEnablePin, LOW);
-  byte incoming = shiftIn(dataIn, clockIn, LSBFIRST);
-  byte incoming2 = shiftIn(dataIn, clockIn, LSBFIRST);
+  incoming = shiftIn(dataIn, clockIn, MSBFIRST);
+  incoming2 = shiftIn(dataIn, clockIn, MSBFIRST);
   digitalWrite(clockEnablePin, HIGH);
+}
 
-  // Print to serial monitor
-  Serial.print("Pin States:\r\n");
-  Serial.print(incoming, BIN);
-  Serial.println(incoming2, BIN);
-  delay(200);
+
+void updatePullRegister(){
+  digitalWrite(clockEnablePin, HIGH); //First step here will be to pulse the latch/reset pin while sending a falling clock signal.
+  digitalWrite(load, LOW); //This will lock in the current state of the inputs to be sent to the arduino. 
+  delayMicroseconds(5);
+  digitalWrite(clockEnablePin, LOW);
+  digitalWrite(load, HIGH); 
+
+  for(int i = 0;i<8;i++){
+    bitWrite(incoming, i, digitalRead(dataIn)); //Grab our byte, select which bit, and write the current input as 1 or 0
+
+    digitalWrite(clockEnablePin, LOW); 
+    delayMicroseconds(5);
+    digitalWrite(clockEnablePin, HIGH); //send a clock leading edge so to load the next bit
+  }
+    for(int i = 0;i<8;i++){
+    bitWrite(incoming2, i, digitalRead(dataIn)); //Grab our byte, select which bit, and write the current input as 1 or 0
+
+    digitalWrite(clockEnablePin, LOW); 
+    delayMicroseconds(5);
+    digitalWrite(clockEnablePin, HIGH); //send a clock leading edge so to load the next bit
+  }
+
 }
